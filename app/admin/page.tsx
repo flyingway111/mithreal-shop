@@ -79,7 +79,16 @@ export default function AdminPage() {
     if (!form.name || !form.price) return
     setSaving(true)
     const images = imgInput.split('\n').map(s => s.trim()).filter(Boolean)
-    const data = { ...form, images, price: Number(form.price), stock: Number(form.stock) }
+    const data = {
+      name: form.name,
+      price: Number(form.price),
+      category: form.category,
+      sizes: form.sizes,
+      images,
+      is_new: form.is_new,
+      stock: Number(form.stock) || 1,
+      description: form.description,
+    }
 
     if (editing?.id) {
       await supabase.from('products').update(data).eq('id', editing.id)
