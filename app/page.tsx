@@ -266,18 +266,22 @@ function ProductCard({ product, onOpen, wished, onWishlist }: {
         <img src={product.images[0]} alt={product.name}
           style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', filter:'brightness(0.3)' }}/>
 
-        {/* Center icon */}
-        <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:10 }}>
-          <div style={{ fontSize:40, lineHeight:1 }}>{CAT_ICON[product.category] ?? '🏷️'}</div>
-          <div style={{ fontSize:13, fontWeight:600, color:'rgba(255,255,255,0.85)', letterSpacing:'0.04em' }}>
+        {/* Center icon only */}
+        <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <div style={{ fontSize:44, lineHeight:1 }}>{CAT_ICON[product.category] ?? '🏷️'}</div>
+        </div>
+
+        {/* Bottom category label */}
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'8px 10px', background:'linear-gradient(transparent, rgba(0,0,0,0.7))' }}>
+          <div style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.7)', letterSpacing:'0.04em' }}>
             {CAT_LABEL[product.category] ?? ''}
           </div>
         </div>
 
         {/* Top row badges */}
-        <div style={{ position:'absolute', top:10, left:10, display:'flex', flexDirection:'column', gap:4 }}>
-          {product.isNew && <div style={{ background:S.white, color:S.bg, fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6 }}>NEW</div>}
-          {product.stock === 1 && <div style={{ background:S.amber, color:'#000', fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6 }}>LAST</div>}
+        <div style={{ position:'absolute', top:8, left:8, display:'flex', gap:4 }}>
+          {product.isNew && <div style={{ background:S.white, color:S.bg, fontSize:9, fontWeight:800, padding:'2px 6px', borderRadius:4 }}>NEW</div>}
+          {product.stock === 1 && <div style={{ background:S.amber, color:'#000', fontSize:9, fontWeight:800, padding:'2px 6px', borderRadius:4 }}>LAST</div>}
         </div>
 
         {/* Wishlist */}
