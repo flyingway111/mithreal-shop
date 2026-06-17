@@ -61,6 +61,7 @@ export default function AdminPage() {
   const [form, setForm] = useState<Product>(EMPTY)
   const [saving, setSaving] = useState(false)
   const [imgInput, setImgInput] = useState('')
+  const [uploading, setUploading] = useState(false)
 
   const load = async () => {
     setLoading(true)
@@ -94,6 +95,21 @@ export default function AdminPage() {
     if (!confirm('Удалить товар?')) return
     await supabase.from('products').delete().eq('id', id)
     load()
+  }
+
+  const uploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    const ext = file.name.split('.').pop()
+    const path = `${Date.now()}.${ext}`
+    const { error } = await supabase.storage.from('products').upload(path, file)
+    if (!error) {
+      const { data } = supabase.storage.from('products').getPublicUrl(path)
+      setImgInput(prev => prev ? prev + '\n' + data.publicUrl : data.publicUrl)
+    }
+    setUploading(false)
+    e.target.value = ''
   }
 
   const toggleSize = (s: string) => {
@@ -242,8 +258,23 @@ export default function AdminPage() {
 
               {/* Images */}
               <div style={{ marginBottom: 14 }}>
-                <div style={{ fontSize: 11, color: S.grey, letterSpacing: '0.1em', marginBottom: 6 }}>ССЫЛКИ НА ФОТО (каждая с новой строки)</div>
-                <textarea value={imgInput} onChange={e => setImgInput(e.target.value)} placeholder="https://example.com/photo1.jpg&#10;https://example.com/photo2.jpg" rows={3}
+                <div style={{ fontSize: 11, color: S.grey, letterSpacing: '0.1em', marginBottom: 8 }}>ФОТО</div>
+                <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px 0', borderRadius: 10, border: `1px dashed ${S.border}`, background: S.card2, color: uploading ? S.grey : S.white, fontSize: 14, fontWeight: 500, cursor: 'pointer', marginBottom: 10 }}>
+                  {uploading ? 'Загружаем...' : '+ Выбрать фото из галереи'}
+                  <input type="file" accept="image/*" onChange={uploadPhoto} style={{ display: 'none' }} multiple/>
+                </label>
+                {imgInput && (
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+                    {imgInput.split('\n').filter(Boolean).map((url, i) => (
+                      <div key={i} style={{ position: 'relative' }}>
+                        <img src={url} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8 }}/>
+                        <button onClick={() => setImgInput(imgInput.split('\n').filter((_, j) => j !== i).join('\n'))}
+                          style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: S.red, border: 'none', color: S.white, fontSize: 11, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <textarea value={imgInput} onChange={e => setImgInput(e.target.value)} placeholder="Или вставь ссылку на фото..." rows={2}
                   style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: `1px solid ${S.border}`, background: S.card2, color: S.white, fontSize: 13, outline: 'none', resize: 'none', lineHeight: 1.6 }}/>
               </div>
 
