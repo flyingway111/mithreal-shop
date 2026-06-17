@@ -275,7 +275,7 @@ function ProductCard({ product, onOpen, wished, onWishlist }: {
         </div>
 
         {/* Top row badges */}
-        <div style={{ position:'absolute', top:10, left:10, display:'flex', gap:5 }}>
+        <div style={{ position:'absolute', top:10, left:10, display:'flex', flexDirection:'column', gap:4 }}>
           {product.isNew && <div style={{ background:S.white, color:S.bg, fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6 }}>NEW</div>}
           {product.stock === 1 && <div style={{ background:S.amber, color:'#000', fontSize:10, fontWeight:800, padding:'3px 8px', borderRadius:6 }}>LAST</div>}
         </div>
