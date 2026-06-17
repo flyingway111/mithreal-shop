@@ -297,9 +297,12 @@ function ProductCard({ product, onOpen, wished, onWishlist }: {
       </div>
 
       {/* Price bottom */}
-      <div style={{ padding:'12px 14px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <div style={{ fontSize:16, fontWeight:700 }}>{product.price.toLocaleString('ru-RU')}₽</div>
-        <div style={{ fontSize:11, color:S.grey }}>{product.sizes.slice(0,3).join(' · ')}{product.sizes.length > 3 ? '...' : ''}</div>
+      <div style={{ padding:'10px 12px 14px' }}>
+        <div style={{ fontSize:13, color:'rgba(255,255,255,0.75)', marginBottom:4, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{product.name}</div>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div style={{ fontSize:16, fontWeight:700 }}>{product.price.toLocaleString('ru-RU')}₽</div>
+          <div style={{ fontSize:11, color:S.grey }}>{product.sizes.slice(0,3).join(' · ')}{product.sizes.length > 3 ? '...' : ''}</div>
+        </div>
       </div>
     </div>
   )
