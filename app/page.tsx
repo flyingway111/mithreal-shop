@@ -263,20 +263,21 @@ function ProductCard({ product, onOpen, wished, onWishlist }: {
   return (
     <div style={{ background:S.card, borderRadius:14, overflow:'hidden', cursor:'pointer', position:'relative' }} onClick={onOpen}>
       <div style={{ position:'relative', aspectRatio:'3/4', background:'#0f0f0f' }}>
-        <img src={product.images[0]} alt={product.name}
-          style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', filter:'brightness(0.3)' }}/>
-
-        {/* Center icon only */}
-        <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-          <div style={{ fontSize:44, lineHeight:1 }}>{CAT_ICON[product.category] ?? '🏷️'}</div>
-        </div>
-
-        {/* Bottom category label */}
-        <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'8px 10px', background:'linear-gradient(transparent, rgba(0,0,0,0.7))' }}>
-          <div style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.7)', letterSpacing:'0.04em' }}>
-            {CAT_LABEL[product.category] ?? ''}
-          </div>
-        </div>
+        {product.images[0] ? (
+          <img src={product.images[0]} alt={product.name}
+            style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+        ) : (
+          <>
+            <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ fontSize:44, lineHeight:1 }}>{CAT_ICON[product.category] ?? '🏷️'}</div>
+            </div>
+            <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'8px 10px' }}>
+              <div style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.7)', letterSpacing:'0.04em' }}>
+                {CAT_LABEL[product.category] ?? ''}
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Top row badges */}
         <div style={{ position:'absolute', top:8, left:8, display:'flex', gap:4 }}>
