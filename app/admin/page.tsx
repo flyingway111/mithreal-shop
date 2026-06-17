@@ -25,8 +25,8 @@ type Product = {
 }
 
 const EMPTY: Product = {
-  name: '', price: 0, category: 'tshirts',
-  sizes: [], images: [], is_new: false, stock: 1, description: ''
+  name: '', price: undefined as unknown as number, category: 'tshirts',
+  sizes: [], images: [], is_new: false, stock: undefined as unknown as number, description: ''
 }
 
 const CATEGORIES = [
@@ -36,7 +36,7 @@ const CATEGORIES = [
 ]
 
 const CLOTHING_SIZES = ['XS','S','M','L','XL','XXL']
-const SHOE_SIZES = ['38','39','40','41','42','43','44','45']
+const SHOE_SIZES = ['36','37','38','39','40','41','42','43','44','45','46','47','48']
 
 function Input({ label, value, onChange, type = 'text', placeholder = '' }: {
   label: string; value: string | number; onChange: (v: string) => void; type?: string; placeholder?: string
@@ -44,7 +44,8 @@ function Input({ label, value, onChange, type = 'text', placeholder = '' }: {
   return (
     <div style={{ marginBottom: 14 }}>
       <div style={{ fontSize: 11, color: S.grey, letterSpacing: '0.1em', marginBottom: 6 }}>{label}</div>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+      <input type={type === 'number' ? 'text' : type} inputMode={type === 'number' ? 'numeric' : undefined}
+        value={value ?? ''} onChange={e => onChange(e.target.value)} placeholder={placeholder}
         style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: `1px solid ${S.border}`, background: S.card2, color: S.white, fontSize: 14, outline: 'none' }}/>
     </div>
   )
