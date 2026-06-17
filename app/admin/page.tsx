@@ -76,7 +76,7 @@ export default function AdminPage() {
   const openEdit = (p: Product) => { setForm(p); setEditing(p); setImgInput(p.images.join('\n')); setShowForm(true) }
 
   const save = async () => {
-    if (!form.name || !form.price) return
+    if (!form.name || !form.price || Number(form.price) <= 0) return
     setSaving(true)
     const images = imgInput.split('\n').map(s => s.trim()).filter(Boolean)
     const data = {
@@ -306,10 +306,10 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              <button onClick={save} disabled={saving || !form.name || !form.price} style={{
+              <button onClick={save} disabled={saving || !form.name} style={{
                 width: '100%', padding: '15px 0', borderRadius: 12, border: 'none',
-                background: form.name && form.price ? S.white : S.border,
-                color: form.name && form.price ? S.bg : S.grey,
+                background: form.name ? S.white : S.border,
+                color: form.name ? S.bg : S.grey,
                 fontSize: 15, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}>
                 {saving ? 'Сохраняем...' : <><Check size={17}/>{editing ? 'Сохранить' : 'Добавить товар'}</>}
