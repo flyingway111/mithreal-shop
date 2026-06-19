@@ -154,8 +154,8 @@ function OrderModal({ onClose, onSuccess, products }: { onClose: () => void; onS
   const send = () => {
     if (!name || !phone) return
     const list = items.map(i => `• ${i.product.name} (${i.size}) x${i.qty} — ${(i.product.price*i.qty).toLocaleString('ru-RU')}₽`).join('\n')
-    const msg = `🛍 Новый заказ MITHREAL SHOP\n\n👤 ${name}\n📞 ${phone}\n📦 ${delivery}${address?'\n📍 '+address:''}\n\n${list}\n\n💰 Итого: ${total.toLocaleString('ru-RU')}₽`
-    window.open(`https://t.me/mithreal_shop?text=${encodeURIComponent(msg)}`, '_blank')
+    const msg = `🛍 Новый заказ SHOP SHOP\n\n👤 ${name}\n📞 ${phone}\n📦 ${delivery}${address?'\n📍 '+address:''}\n\n${list}\n\n💰 Итого: ${total.toLocaleString('ru-RU')}₽`
+    window.open(`https://t.me/xapsu?text=${encodeURIComponent(msg)}`, '_blank')
     onSuccess()
   }
 
@@ -390,8 +390,8 @@ export default function Home() {
               <Search size={20} color={S.grey}/>
             </button>
             <div style={{ textAlign:'center' }}>
-              <div style={{ fontSize:17, fontWeight:900, letterSpacing:'0.12em' }}>MITHREAL</div>
-              <div style={{ fontSize:8, color:S.grey, letterSpacing:'0.3em', marginTop:-1 }}>SHOP</div>
+              <div style={{ fontSize:17, fontWeight:900, letterSpacing:'0.12em' }}>SHOP</div>
+              <div style={{ fontSize:8, color:S.grey, letterSpacing:'0.3em', marginTop:-1 }}>STREETWEAR</div>
             </div>
             {/* placeholder for symmetry */}
             <div style={{ width:28 }}/>
@@ -421,8 +421,8 @@ export default function Home() {
           <div style={{ position:'relative', height:140, overflow:'hidden', background:'#0D0D0D', marginBottom:2 }}>
             <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)', backgroundSize:'28px 28px', opacity:0.03 }}/>
             <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
-              <div style={{ fontSize:46, fontWeight:900, letterSpacing:'0.14em', color:S.white, lineHeight:1 }}>MITHREAL</div>
-              <div style={{ fontSize:10, letterSpacing:'0.45em', color:S.grey, marginTop:8 }}>SHOP</div>
+              <div style={{ fontSize:46, fontWeight:900, letterSpacing:'0.14em', color:S.white, lineHeight:1 }}>SHOP</div>
+              <div style={{ fontSize:10, letterSpacing:'0.45em', color:S.grey, marginTop:8 }}>STREETWEAR</div>
             </div>
           </div>
 
