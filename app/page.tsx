@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { ShoppingBag, Heart, Search, X, Plus, Minus, SlidersHorizontal, Trash2, ArrowUpDown, Package } from 'lucide-react'
+import { ShoppingBag, Heart, Search, X, Plus, Minus, SlidersHorizontal, Trash2, ArrowUpDown, Package, Truck, Mail, MapPin } from 'lucide-react'
 import { CATEGORIES, type Product } from './data/products'
 import { supabase } from './lib/supabase'
 
@@ -147,65 +147,143 @@ function OrderModal({ onClose, onSuccess, products }: { onClose: () => void; onS
   const [phone, setPhone] = useState('')
   const [delivery, setDelivery] = useState('СДЭК')
   const [address, setAddress] = useState('')
+  const [focused, setFocused] = useState<string | null>(null)
+
   const items = getCart().map(i => ({ ...i, product: products.find(p => p.id===i.id)! })).filter(i=>i.product)
   const total = items.reduce((s,i) => s + i.product.price*i.qty, 0)
-  const DELIVERIES = ['СДЭК','Яндекс Доставка','Почта России','Самовывоз (Москва)']
+
+  const DELIVERIES = [
+    { id: 'СДЭК',              label: 'СДЭК',          sub: 'До двери или ПВЗ',   Icon: Package },
+    { id: 'Яндекс Доставка',   label: 'Яндекс',        sub: 'Курьер до двери',    Icon: Truck   },
+    { id: 'Почта России',      label: 'Почта России',  sub: 'Доставка почтой',    Icon: Mail    },
+    { id: 'Самовывоз (Москва)',label: 'Самовывоз',     sub: 'Москва, адрес в чате', Icon: MapPin },
+  ]
 
   const send = () => {
     if (!name || !phone) return
     const list = items.map(i => `• ${i.product.name} (${i.size}) x${i.qty} — ${(i.product.price*i.qty).toLocaleString('ru-RU')}₽`).join('\n')
-    const msg = `🛍 Новый заказ SHOP SHOP\n\n👤 ${name}\n📞 ${phone}\n📦 ${delivery}${address?'\n📍 '+address:''}\n\n${list}\n\n💰 Итого: ${total.toLocaleString('ru-RU')}₽`
+    const msg = `🛍 Новый заказ SHOP\n\n👤 ${name}\n📞 ${phone}\n📦 ${delivery}${address?'\n📍 '+address:''}\n\n${list}\n\n💰 Итого: ${total.toLocaleString('ru-RU')}₽`
     window.open(`https://t.me/xapsu?text=${encodeURIComponent(msg)}`, '_blank')
     onSuccess()
   }
 
+  const inputSt = (key: string): React.CSSProperties => ({
+    width: '100%', padding: '14px 16px', borderRadius: 12,
+    border: `1.5px solid ${focused === key ? S.white : S.border}`,
+    background: S.bg, color: S.white, fontSize: 15, outline: 'none',
+    transition: 'border-color 0.15s', boxSizing: 'border-box',
+  })
+
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.92)', zIndex:200, display:'flex', alignItems:'flex-end' }} onClick={onClose}>
-      <div style={{ background:S.card, borderRadius:'20px 20px 0 0', width:'100%', maxHeight:'92vh', overflowY:'auto' }} onClick={e=>e.stopPropagation()}>
-        <div style={{ padding:'20px 18px 44px' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
-            <div style={{ fontSize:18, fontWeight:700 }}>Оформление</div>
-            <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer' }}><X size={20} color={S.white}/></button>
+      <div style={{ background:S.card, borderRadius:'24px 24px 0 0', width:'100%', maxHeight:'94vh', overflowY:'auto' }} onClick={e=>e.stopPropagation()}>
+
+        {/* Drag handle */}
+        <div style={{ display:'flex', justifyContent:'center', padding:'12px 0 2px' }}>
+          <div style={{ width:36, height:4, borderRadius:2, background:S.border }}/>
+        </div>
+
+        <div style={{ padding:'16px 18px 52px' }}>
+
+          {/* Header */}
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:28 }}>
+            <div>
+              <div style={{ fontSize:22, fontWeight:800, letterSpacing:'0.01em' }}>Оформление</div>
+              <div style={{ fontSize:12, color:S.grey, marginTop:3 }}>
+                {items.reduce((s,i)=>s+i.qty,0)} {items.reduce((s,i)=>s+i.qty,0) === 1 ? 'товар' : 'товара'} · {total.toLocaleString('ru-RU')} ₽
+              </div>
+            </div>
+            <button onClick={onClose} style={{ width:36, height:36, borderRadius:'50%', background:S.card2, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <X size={16} color={S.white}/>
+            </button>
           </div>
 
-          <div style={{ background:S.card2, borderRadius:14, padding:16, marginBottom:12 }}>
-            <div style={{ fontSize:11, color:S.grey, letterSpacing:'0.12em', marginBottom:14 }}>КОНТАКТЫ</div>
-            <input value={name} onChange={e=>setName(e.target.value)} placeholder="Имя *" style={{ width:'100%', padding:'13px 14px', borderRadius:10, border:`1px solid ${S.border}`, background:S.bg, color:S.white, fontSize:14, marginBottom:10, outline:'none' }}/>
-            <input value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+7 (___) ___-__-__ *" style={{ width:'100%', padding:'13px 14px', borderRadius:10, border:`1px solid ${S.border}`, background:S.bg, color:S.white, fontSize:14, outline:'none' }}/>
+          {/* CONTACTS */}
+          <div style={{ marginBottom:22 }}>
+            <div style={{ fontSize:11, color:S.grey, letterSpacing:'0.15em', marginBottom:12 }}>ПОЛУЧАТЕЛЬ</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              <input value={name} onChange={e=>setName(e.target.value)} placeholder="Имя"
+                onFocus={()=>setFocused('name')} onBlur={()=>setFocused(null)} style={inputSt('name')}/>
+              <input value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+7 (___) ___-__-__" type="tel"
+                onFocus={()=>setFocused('phone')} onBlur={()=>setFocused(null)} style={inputSt('phone')}/>
+            </div>
           </div>
 
-          <div style={{ background:S.card2, borderRadius:14, padding:16, marginBottom:12 }}>
-            <div style={{ fontSize:11, color:S.grey, letterSpacing:'0.12em', marginBottom:14 }}>ДОСТАВКА</div>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:12 }}>
-              {DELIVERIES.map(d => (
-                <button key={d} onClick={() => setDelivery(d)} style={{
-                  padding:'12px 10px', borderRadius:10, textAlign:'center', fontSize:12, fontWeight:500,
-                  border:`1px solid ${delivery===d ? S.white : S.border}`,
-                  background: delivery===d ? 'rgba(255,255,255,0.1)' : 'transparent',
-                  color: delivery===d ? S.white : S.grey, cursor:'pointer', lineHeight:1.3,
-                }}>{d}</button>
-              ))}
+          {/* DELIVERY */}
+          <div style={{ marginBottom:22 }}>
+            <div style={{ fontSize:11, color:S.grey, letterSpacing:'0.15em', marginBottom:12 }}>ДОСТАВКА</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              {DELIVERIES.map(({ id, label, sub, Icon }) => {
+                const active = delivery === id
+                return (
+                  <button key={id} onClick={() => setDelivery(id)} style={{
+                    display:'flex', alignItems:'center', gap:14, padding:'13px 14px', borderRadius:14, cursor:'pointer', textAlign:'left',
+                    border: `1.5px solid ${active ? S.white : S.border}`,
+                    background: active ? 'rgba(255,255,255,0.05)' : 'transparent',
+                    transition:'all 0.15s',
+                  }}>
+                    <div style={{ width:40, height:40, borderRadius:10, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center',
+                      background: active ? 'rgba(255,255,255,0.12)' : S.card2 }}>
+                      <Icon size={18} color={active ? S.white : S.grey}/>
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:14, fontWeight:600, color: active ? S.white : '#bbb', marginBottom:2 }}>{label}</div>
+                      <div style={{ fontSize:11, color:S.grey }}>{sub}</div>
+                    </div>
+                    <div style={{ width:20, height:20, borderRadius:'50%', flexShrink:0, border:`2px solid ${active ? S.white : S.border}`,
+                      display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      {active && <div style={{ width:8, height:8, borderRadius:'50%', background:S.white }}/>}
+                    </div>
+                  </button>
+                )
+              })}
             </div>
             {delivery !== 'Самовывоз (Москва)' && (
-              <input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Адрес доставки" style={{ width:'100%', padding:'13px 14px', borderRadius:10, border:`1px solid ${S.border}`, background:S.bg, color:S.white, fontSize:14, outline:'none' }}/>
+              <div style={{ marginTop:10 }}>
+                <input value={address} onChange={e=>setAddress(e.target.value)} placeholder="Адрес доставки"
+                  onFocus={()=>setFocused('address')} onBlur={()=>setFocused(null)} style={inputSt('address')}/>
+              </div>
             )}
           </div>
 
-          <div style={{ background:S.card2, borderRadius:14, padding:16, marginBottom:20 }}>
-            <div style={{ fontSize:11, color:S.grey, letterSpacing:'0.12em', marginBottom:14 }}>ЗАКАЗ</div>
-            {items.map(i => (
-              <div key={`${i.id}-${i.size}`} style={{ display:'flex', justifyContent:'space-between', fontSize:13, marginBottom:6 }}>
-                <span style={{ color:S.grey, flex:1, marginRight:8 }}>{i.product.name} ({i.size})</span>
-                <span style={{ fontWeight:600 }}>{(i.product.price*i.qty).toLocaleString('ru-RU')}₽</span>
+          {/* ORDER ITEMS */}
+          <div style={{ background:S.card2, borderRadius:16, overflow:'hidden', marginBottom:22 }}>
+            <div style={{ padding:'14px 16px 10px', fontSize:11, color:S.grey, letterSpacing:'0.15em' }}>ВАШ ЗАКАЗ</div>
+            {items.map((i, idx) => (
+              <div key={`${i.id}-${i.size}`} style={{
+                display:'flex', alignItems:'center', gap:12, padding:'10px 16px',
+                borderTop: idx > 0 ? `1px solid rgba(255,255,255,0.05)` : 'none',
+              }}>
+                <div style={{ width:44, height:54, borderRadius:8, overflow:'hidden', flexShrink:0, background:'#111' }}>
+                  {i.product.images?.[0]
+                    ? <img src={i.product.images[0]} alt={i.product.name} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+                    : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20 }}>{CAT_ICON[i.product.category]}</div>
+                  }
+                </div>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:13, fontWeight:500, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{i.product.name}</div>
+                  <div style={{ fontSize:11, color:S.grey, marginTop:2 }}>
+                    {i.size}{i.qty > 1 ? ` · ${i.qty} шт.` : ''}
+                  </div>
+                </div>
+                <div style={{ fontSize:14, fontWeight:700, flexShrink:0 }}>{(i.product.price*i.qty).toLocaleString('ru-RU')} ₽</div>
               </div>
             ))}
-            <div style={{ borderTop:`1px solid ${S.border}`, marginTop:10, paddingTop:10, display:'flex', justifyContent:'space-between', fontWeight:700, fontSize:15 }}>
-              <span>Итого</span><span>{total.toLocaleString('ru-RU')}₽</span>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 16px', borderTop:`1px solid rgba(255,255,255,0.08)` }}>
+              <span style={{ fontSize:13, color:S.grey }}>Итого</span>
+              <span style={{ fontSize:18, fontWeight:800 }}>{total.toLocaleString('ru-RU')} ₽</span>
             </div>
           </div>
 
-          <button onClick={send} disabled={!name||!phone} style={{ width:'100%', padding:'16px 0', borderRadius:14, border:'none', background:name&&phone?S.white:S.border, color:name&&phone?S.bg:S.grey, fontSize:15, fontWeight:700, cursor:name&&phone?'pointer':'default', transition:'all 0.2s' }}>
-            📩 Написать продавцу
+          {/* CTA */}
+          <button onClick={send} disabled={!name||!phone} style={{
+            width:'100%', padding:'17px 0', borderRadius:14, border:'none',
+            background: name&&phone ? S.white : S.border,
+            color: name&&phone ? S.bg : S.grey,
+            fontSize:15, fontWeight:800, cursor: name&&phone ? 'pointer' : 'default',
+            transition:'all 0.2s', letterSpacing:'0.03em',
+          }}>
+            Отправить заказ
           </button>
         </div>
       </div>
